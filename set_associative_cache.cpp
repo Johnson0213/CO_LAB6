@@ -24,18 +24,19 @@ struct cache_content {
 
 const int K = 1024;
 
-double log2(double n) {
+double log_2(double n) {
     // log(n) / log(2) is log2.
     return log(n) / log(double(2));
 }
 
 
-double simulate(int cache_size, int block_size, int way_n) {
+void simulate(int cache_size, int block_size, int way_n) {
     unsigned int tag, index, x;
     int cnt_miss = 0, cnt_hit = 0;
-
-    int offset_bit = (int)log2(block_size);
-    int index_bit = (int)log2(cache_size / block_size / way_n); // log2(# of cache contents)
+    //cout<< log_2(4.0);
+    //cout<< log2(4.0);
+    int offset_bit = (int)log_2(block_size);
+    int index_bit = (int)log_2(cache_size / block_size / way_n); // log2(# of cache contents)
     int line = cache_size / block_size / way_n; // # of cache contents
 
     cache_content *cache = new cache_content[line]; // declaration of blocks
@@ -94,25 +95,29 @@ double simulate(int cache_size, int block_size, int way_n) {
 
     delete [] cache;
 
+    double hit_rate = cnt_hit / (double)(cnt_hit + cnt_miss);
     double miss_rate = cnt_miss / (double)(cnt_hit + cnt_miss);
-    return miss_rate;
+    cout << "Hit rate: " << setw(5) << setprecision(3) << fixed << hit_rate * 100 << "%";
+    cout << " (" << cnt_hit << "),  ";
+    cout << "Miss rate: " << setw(5) << setprecision(3) << fixed << miss_rate * 100 << "%";
+    cout << " (" << cnt_miss << ")";
 }
 
 int main() {
     cout << "\n=== set_associative_cache.cpp ===\n";
     cout << "\nLRU.txt\n\n";
-    cout << "         1-way    2-way    4-way    8-way\n";
-    cout << "-----------------------------------------\n";
-    for (int i = 0; i < 7; i ++) {
-        cout << setw(2) << csz[i] << "K: ";
-        for (int j = 0; j < 4; j ++) {
-            cache_sz = csz[i]; // K
+    for (int i = 0; i < 4; i ++) {
+        for (int j = 0; j < 7; j ++) {
+            cout << way[i] << "-N Way\n";
+            cout << "Cache_size: " << setw(3) << csz[j] << "K\n";
+            cout << "Block_size: " << setw(3) << "64\n";
+            cache_sz = csz[j]; // K
             block_sz = 64;
-            way_n = way[j];
-            double ret = simulate(cache_sz * K, block_sz, way_n);
-            cout << setw(9) << setprecision(3) << fixed << ret * 100;
+            way_n = way[i];
+            simulate(cache_sz * K, block_sz, way_n);
+            cout << "\n\n";
         }
         cout << '\n';
     }
-    cout << "\n\n";
+    cout << "\n";
 }

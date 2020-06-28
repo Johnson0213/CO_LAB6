@@ -23,7 +23,7 @@ double log2(double n) {
 }
 
 
-double simulate(int cache_size, int block_size, int data) {
+void simulate(int cache_size, int block_size, int data) {
     unsigned int tag, index, x;
     int cnt_miss = 0, cnt_hit = 0;
 
@@ -55,12 +55,15 @@ double simulate(int cache_size, int block_size, int data) {
         }
     }
     fclose(fp);
-
-    double miss_rate = cnt_miss / (double)(cnt_hit + cnt_miss);
-
     delete [] cache;
-
-    return miss_rate;
+    double miss_rate = cnt_miss / (double)(cnt_hit + cnt_miss);
+    double hit_rate = cnt_hit / (double)(cnt_hit + cnt_miss);
+    cout << "Hit rate: " << setw(5) << setprecision(3) << fixed << hit_rate * 100 << "%";
+    cout << " (" << cnt_hit << "),  ";
+    cout << "Miss rate: " << setw(5) << setprecision(3) << fixed << miss_rate * 100 << "%";
+    cout << " (" << cnt_miss << ")";
+    
+    
 }
 
 int main() {
@@ -69,18 +72,17 @@ int main() {
     for (int k = 0; k < 2; k ++) {
         if (k == 0) cout << "\nICACHE.txt\n\n";
         if (k == 1) cout << "\nDCACHE.txt\n\n";
-        cout << "             16       32       64      128      256\n";
-        cout << "---------------------------------------------------\n";
         for (int i = 0; i < 4; i ++) {
-            cout << setw(3) << csz[i] << "K: ";
             for (int j = 0; j < 5; j ++) {
+            	cout << "Cache_size: " << setw(3) << csz[i] << "K\n";
+            	cout << "Block_size: " << setw(3) << bsz[j] << "\n";
                 cache_sz = csz[i];
                 block_sz = bsz[j];
-                double ret = simulate(cache_sz * K, block_sz, k);
-                cout << setw(9) << setprecision(3) << fixed << ret * 100;
+                simulate(cache_sz * K, block_sz, k);
+                cout << "\n\n";
             }
             cout << '\n';
         }
-    }
-    cout << "\n\n";
+    cout << "\n";
+	}
 }
